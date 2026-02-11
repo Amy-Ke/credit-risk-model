@@ -1,113 +1,108 @@
-# Credit Risk Model - Loan Default Prediction
+# Portfolio Optimization - Modern Portfolio Theory
 
 ## Overview
-A machine learning model that predicts the probability of loan default using logistic regression. Built and validated on **150,000 real borrower records** from the Give Me Some Credit dataset. Achieves an **AUC score of 0.8338**, demonstrating strong discriminatory power between defaulting and non-defaulting borrowers.
+Implementation of **Markowitz Mean-Variance Optimization** to construct the efficient frontier and identify optimal portfolios across 10 major US stocks. Simulates **5,000 random portfolios** to map the risk-return tradeoff and identifies the Maximum Sharpe Ratio and Minimum Volatility portfolios.
 
-## Model Performance
-| Metric | Score |
-|--------|-------|
-| AUC Score | 0.8338 |
-| Accuracy | 75.94% |
-| Recall (Default Detection) | 74.51% |
-| Precision | 18.22% |
-| True Positives (Defaults Caught) | 1,494 |
-| False Negatives (Missed Defaults) | 511 |
-| Training Set | 120,000 borrowers |
-| Test Set | 30,000 borrowers |
+## Portfolio Universe
+| Stock | Company |
+|-------|---------|
+| AAPL | Apple Inc. |
+| MSFT | Microsoft Corporation |
+| GOOGL | Alphabet Inc. |
+| AMZN | Amazon.com Inc. |
+| JPM | JPMorgan Chase |
+| JNJ | Johnson & Johnson |
+| V | Visa Inc. |
+| PG | Procter & Gamble |
+| XOM | ExxonMobil Corporation |
+| BRK-B | Berkshire Hathaway |
 
-## Dataset Overview
-| Statistic | Value |
-|-----------|-------|
-| Total Borrowers | 150,000 |
-| Default Rate | 6.68% |
-| Average Age | 52.3 years |
-| Avg Monthly Income | $5,400 |
-| Avg Debt Ratio | 226.33% |
-| Avg Open Credit Lines | 8.5 |
+## Key Results
+| Portfolio | Annual Return | Volatility | Sharpe Ratio |
+|-----------|--------------|------------|--------------|
+| Max Sharpe Ratio | Optimized | Optimized | Maximum |
+| Min Volatility | Lowest Risk | Minimum | Stable |
+| Risk-Free Rate | 5.00% | - | - |
 
-## Key Findings
-- **#1 Predictor of Default:** Number of times 30-59 days past due - payment history is the strongest signal of future default
-- **#2 Predictor:** Number of times 90+ days late - severe delinquency dramatically increases default probability
-- **#3 Predictor:** Revolving credit utilization - high utilization signals financial stress
-- **Age and income** are less predictive than payment behavior, suggesting behavioral factors outweigh demographic ones
-- Model successfully handled **class imbalance** (only 6.68% defaults) using balanced class weights
-- **33,655 missing values** identified and imputed using median strategy before modeling
-
-## Performance Dashboard
-![Credit Risk Performance](credit_risk_performance.png)
+## Optimization Dashboard
+![Portfolio Optimization](portfolio_optimization.png)
 
 ## Methodology
-### Data Preprocessing
-- Loaded and cleaned 150,000 borrower records
-- Imputed missing values using median imputation for MonthlyIncome and NumberOfDependents
-- Clipped outliers in revolving utilization (0-100%), debt ratio, and age
-- Standardized all features using StandardScaler for logistic regression
+### Modern Portfolio Theory (Markowitz, 1952)
+- **Monte Carlo Simulation:** 5,000 random portfolio weight combinations
+- **Efficient Frontier:** Maps all optimal risk-return combinations
+- **Maximum Sharpe Ratio:** Best risk-adjusted return portfolio
+- **Minimum Volatility:** Lowest risk portfolio regardless of return
 
-### Feature Engineering
-10 features used for prediction:
-1. Revolving utilization of unsecured lines
-2. Age
-3. Number of times 30-59 days past due
-4. Debt ratio
-5. Monthly income
-6. Number of open credit lines and loans
-7. Number of times 90 days late
-8. Number of real estate loans or lines
-9. Number of times 60-89 days past due
-10. Number of dependents
+### Mathematical Framework
+- **Expected Return:** Weighted sum of individual asset returns
+- **Portfolio Variance:** w^T * Σ * w (where Σ is the covariance matrix)
+- **Sharpe Ratio:** (Return - Risk Free Rate) / Volatility
+- **Annualization:** Daily returns × 252 trading days
 
-### Model Selection
-- **Algorithm:** Logistic Regression with balanced class weights
-- **Train/Test Split:** 80/20 with stratification
-- **Evaluation Metrics:** AUC-ROC, accuracy, precision, recall, confusion matrix
+### Data
+- **Source:** Yahoo Finance (yfinance API)
+- **Period:** 5 years of historical daily prices
+- **Frequency:** Daily returns → annualized statistics
+
+## Visualizations
+The dashboard includes 4 charts:
+1. **Efficient Frontier** - 5,000 simulated portfolios colored by Sharpe ratio, with optimal portfolios marked
+2. **Max Sharpe Portfolio Allocation** - Pie chart of optimal risk-adjusted weights
+3. **Min Volatility Portfolio Allocation** - Pie chart of lowest-risk weights
+4. **Individual Stock Sharpe Ratios** - Bar chart comparing each stock's risk-adjusted performance
 
 ## Technologies Used
 - **Python 3.9**
-- **pandas** - Data manipulation and cleaning
-- **NumPy** - Numerical computations
-- **scikit-learn** - Machine learning model and evaluation
-- **Matplotlib** - Performance visualization
+- **pandas** - Data manipulation
+- **NumPy** - Matrix operations and portfolio math
+- **yfinance** - Yahoo Finance market data
+- **scipy** - Portfolio optimization
+- **Matplotlib** - Visualizations
 
 ## Installation & Usage
 
 ### Prerequisites
 ```bash
-python3 -m pip install pandas numpy scikit-learn matplotlib
+python3 -m pip install yfinance pandas numpy matplotlib scipy
 ```
 
-### Run the Model
+### Run the Optimization
 ```bash
-python3 credit_risk_model.py
+python3 portfolio_optimization.py
 ```
 
-### Expected Output
-- Performance metrics printed to console
-- ROC curve, feature importance, confusion matrix, and probability distribution charts
-- `credit_risk_performance.png` saved to directory
+### Customize Your Portfolio
+```python
+optimizer = PortfolioOptimizer(
+    tickers=['AAPL', 'TSLA', 'NVDA', 'META'],  # Your stocks
+    num_portfolios=10000,                         # More = more accurate
+    risk_free_rate=0.05                           # Current risk-free rate
+)
+```
 
 ## Project Structure
 ```
-credit-risk-model/
+portfolio-optimization/
 │
-├── credit_risk_model.py         # Main model and pipeline code
-├── credit_risk_performance.png  # Performance visualization
-├── cs-training.csv              # Training dataset (150K borrowers)
-└── README.md                    # Project documentation
+├── portfolio_optimization.py   # Main optimization code
+├── portfolio_optimization.png  # Efficient frontier dashboard
+└── README.md                   # Project documentation
 ```
 
 ## Future Improvements
-- Implement Random Forest and XGBoost for comparison
-- Add cross-validation for more robust evaluation
-- Develop risk scoring system (probability bands: Low/Medium/High risk)
-- Add SHAP values for model interpretability
-- Build interactive dashboard for risk assessment
+- Add constraints (max weight per stock, sector limits)
+- Implement Black-Litterman model
+- Add rolling window optimization
+- Include transaction cost modeling
+- Build interactive dashboard with Plotly
 
 ## Real-World Applications
-This type of model is used by:
-- **Banks** for credit card and loan approval decisions
-- **Fintech companies** for real-time lending decisions
-- **Risk management teams** for portfolio stress testing
-- **Regulators** for CECL/IFRS9 reserve calculations
+This optimization framework is used by:
+- **Asset managers** for portfolio construction
+- **Risk teams** for portfolio rebalancing
+- **Quant analysts** for factor model development
+- **Robo-advisors** for automated portfolio management
 
 ## Author
 **Amy Ke** | Economics Graduate, George Washington University
